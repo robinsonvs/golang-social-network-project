@@ -15,7 +15,7 @@ type User struct {
 	CreateIn time.Time `json:"createin,omitempty"`
 }
 
-func (user *User) validate() error {
+func (user *User) validate(step string) error {
 	if user.Name == "" {
 		return errors.New("Name is mandatory")
 	}
@@ -28,7 +28,7 @@ func (user *User) validate() error {
 		return errors.New("Mail is mandatory")
 	}
 
-	if user.Password == "" {
+	if step == "register" && user.Password == "" {
 		return errors.New("Password is mandatory")
 	}
 
@@ -41,8 +41,8 @@ func (user *User) format() {
 	user.Mail = strings.TrimSpace(user.Mail)
 }
 
-func (user *User) Prepare() error {
-	if err := user.validate(); err != nil {
+func (user *User) Prepare(step string) error {
+	if err := user.validate(step); err != nil {
 		return err
 	}
 

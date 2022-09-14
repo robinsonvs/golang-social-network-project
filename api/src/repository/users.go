@@ -6,15 +6,15 @@ import (
 	"fmt"
 )
 
-type users struct {
+type Users struct {
 	db *sql.DB
 }
 
-func NewRepositoryUsers(db *sql.DB) *users {
-	return &users{db}
+func NewRepositoryUsers(db *sql.DB) *Users {
+	return &Users{db}
 }
 
-func (repo users) Create(user models.User) (uint64, error) {
+func (repo Users) Create(user models.User) (uint64, error) {
 	statement, err := repo.db.Prepare("insert into users (name, nick, mail, password) values (?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
@@ -35,7 +35,7 @@ func (repo users) Create(user models.User) (uint64, error) {
 
 }
 
-func (repo users) Search(nameOrNick string) ([]models.User, error) {
+func (repo Users) Search(nameOrNick string) ([]models.User, error) {
 	nameOrNick = fmt.Sprintf("%%%s%%", nameOrNick) //%nameOrNick%
 
 	lines, err := repo.db.Query(
@@ -69,7 +69,7 @@ func (repo users) Search(nameOrNick string) ([]models.User, error) {
 	return users, nil
 }
 
-func (repo users) SearchByID(ID uint64) (models.User, error) {
+func (repo Users) SearchByID(ID uint64) (models.User, error) {
 	lines, err := repo.db.Query(
 		"select id, name, nick, mail, createin from users where id = ?",
 		ID,
@@ -93,4 +93,20 @@ func (repo users) SearchByID(ID uint64) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (repo Users) Update(ID uint64, user models.User) error {
+	statement, err := repo.db.Prepare(
+		"update users set name = ?, nick = ?, mail = ? where id = ?",
+	)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(user.Name, user.Nick, user.Mail, ID); err != nil {
+		return err
+	}
+
+	return nil
 }
