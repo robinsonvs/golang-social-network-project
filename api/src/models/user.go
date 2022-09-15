@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"github.com/badoux/checkmail"
 	"strings"
 	"time"
 )
@@ -26,6 +27,10 @@ func (user *User) validate(step string) error {
 
 	if user.Mail == "" {
 		return errors.New("Mail is mandatory")
+	}
+
+	if err := checkmail.ValidateFormat(user.Mail); err != nil {
+		return errors.New("The email is inválid")
 	}
 
 	if step == "register" && user.Password == "" {
