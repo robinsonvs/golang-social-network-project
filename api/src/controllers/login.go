@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"api/src/authentication"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repository"
 	"api/src/responses"
 	"api/src/safety"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -43,5 +45,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("You are authorized!")) // create token in the next features
+	token, _ := authentication.CreateToken(userSavedInDatabase.ID)
+	fmt.Println(token)
+	w.Write([]byte(token))
 }
