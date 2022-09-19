@@ -12,6 +12,9 @@ import (
 var (
 	ConnectionString = ""
 	Port             = 0
+
+	//key is used to sign the token
+	SecretKey []byte
 )
 
 func LoadConfiguration() {
@@ -31,4 +34,6 @@ func LoadConfiguration() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 	)
+
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }
