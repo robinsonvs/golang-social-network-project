@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"api/src/authentication"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repository"
 	"api/src/responses"
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
@@ -102,6 +104,17 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.ParseUint(params["userId"], 10, 64)
 	if err != nil {
 		responses.Err(w, http.StatusBadRequest, err)
+		return
+	}
+
+	userIDInTheTOken, err := authentication.ExtractUserID(r)
+	if err != nil {
+		responses.Err(w, http.StatusUnauthorized, err)
+		return
+	}
+
+	if userID != userIDInTheTOken {
+		responses.Err(w, http.StatusForbidden, errors.New("It is not possible update this user"))
 		return
 	}
 
