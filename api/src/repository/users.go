@@ -142,3 +142,18 @@ func (repo Users) SearchByMail(mail string) (models.User, error) {
 	return user, nil
 
 }
+
+func (repo Users) Follow(userID, followerID uint64) error {
+	statement, err := repo.db.Prepare("insert ignore into followers (user_id, follower_id) values (?, ?)")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(userID, followerID); err != nil {
+		return err
+	}
+
+	return nil
+
+}
